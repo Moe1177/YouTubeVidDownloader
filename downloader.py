@@ -2,6 +2,7 @@ from pytube import YouTube
 import tkinter
 import customtkinter
 import threading
+import os
 
 def download_video():
     try:
@@ -11,20 +12,25 @@ def download_video():
         
         # Start the download in a separate thread
         download_thread = threading.Thread(target=download_video_thread, args=(videoLink,))
+        downloadInfo.configure(text = "Downloading...", text_color = "blue")
         download_thread.start()
     except Exception as err:
-        downloadInfo.configure(text=f"An error has occurred: {err}", text_color="red")
+        downloadInfo.configure(text=f"An error has occurred: {err}", text_color= "red")
 
 def download_video_thread(videoLink):
     try:
         yt_Object = YouTube(videoLink)
         yd = yt_Object.streams.get_highest_resolution()
         title.configure(text = yt_Object.title, text_color = "black")
+       
+        # Download video into specific directory (feel free to change it for your personal case)
+        os.path.join("C:\\Users\\madda\\Documents\\Videos", f"{yt_Object.title}.mp4")
+        
         downloadInfo.configure(text = "Download Complete!", text_color = "green")
-        yd.download()
+        yd.download(output_path = "C:\\Users\\madda\\Documents\\Videos")
     except Exception as err:
         # Update the downloadInfo label from the main thread
-        downloadInfo.configure(text=f"An error has occurred: {err}", text_color="red")
+        downloadInfo.configure(text=f"An error has occurred: {err}", text_color = "red")
     finally:
         # Re-enable the download button after the download is complete or an error occurs
         app.after(0, lambda: download.configure(state=tkinter.NORMAL))
