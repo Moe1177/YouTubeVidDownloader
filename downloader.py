@@ -3,7 +3,8 @@ import tkinter, customtkinter, threading
 from tkinter import filedialog
 
 def save_file():
-    # Ask user the directory
+    #Ask user the directory
+    global folder 
     folder = filedialog.askdirectory()
 
     return folder
@@ -12,7 +13,7 @@ def download_video():
     try:
         videoLink = link.get()
         # Disable the download button while downloading
-        download.configure(state=tkinter.DISABLED)
+        download.configure(state=tkinter.NORMAL)
         
         # Start the download in a separate thread
         download_thread = threading.Thread(target=download_video_thread, args=(videoLink,))
@@ -22,19 +23,18 @@ def download_video():
         downloadInfo.configure(text=f"An error has occurred: {err}", text_color= "red")
 
 def download_video_thread(videoLink):
+    global folder
     try:
         # Creates YouTube Object and how we want to download it
         yt_Object = YouTube(videoLink)
         yd = yt_Object.streams.get_highest_resolution()
         title.configure(text = yt_Object.title, text_color = "black")
         downloadInfo.configure(text = "Download Complete!", text_color = "green")
-        yd.download(output_path = save_file())
+        
+        yd.download(output_path = folder)
     except Exception as err:
         # Update the downloadInfo label from the main thread
         downloadInfo.configure(text=f"An error has occurred: {err}", text_color = "red")
-    finally:
-        # Re-enable the download button after the download is complete or an error occurs
-        app.after(0, lambda: download.configure(state=tkinter.NORMAL))
 
 if __name__ == "__main__":
     # System Settings
@@ -58,6 +58,10 @@ if __name__ == "__main__":
     # Download Information
     downloadInfo = customtkinter.CTkLabel(app, text = "")
     downloadInfo.pack()
+
+    # Save As Button
+    save_as = customtkinter.CTkButton(app, text = "Save as", command = save_file)
+    save_as.pack(padx = 10)
 
     # Download Button
     download = customtkinter.CTkButton(app, text = "Download", command = download_video)
