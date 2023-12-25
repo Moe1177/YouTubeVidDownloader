@@ -12,8 +12,6 @@ def save_file():
 def download_video():
     try:
         videoLink = link.get()
-        # Disable the download button while downloading
-        download.configure(state=tkinter.NORMAL)
         
         # Start the download in a separate thread
         download_thread = threading.Thread(target=download_video_thread, args=(videoLink,))
